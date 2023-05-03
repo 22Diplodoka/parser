@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+from openpyxl import Workbook
+
+wb = Workbook()
+ws = wb.active
+
+wp = requests.get('https://live.skillbox.ru/playlists/code/python/')
+wp.text
+
+soup = BeautifulSoup(wp.text, 'html.parser')
+
+items = soup.find_all(class_ = 'playlist-inner__item')
+
+
+for elem in items:
+  title = elem.find(class_ = 'playlist-inner-card__title hover-card__text playlist-inner-card__title--big').text
+  rurl = elem.find(class_ = 'playlist-inner-card hover-card').attrs['href']
+  url = 'https://live.skillbox.ru' + rurl
+  dur_ = elem.find(class_ = 'playlist-inner-card__small-info').text
+  dur1 = dur_.replace('Видео, ', '')
+  dur = dur1.strip()
+  row = [title, url, dur]
+  print(row)
+  ws.append(row)
+
+wb.save('Парсер сайта скиллбокс.xlsx')
